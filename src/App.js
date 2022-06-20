@@ -1,15 +1,25 @@
+import { Navbar, MaterialSnackbar } from "./components";
+import { CssBaseline } from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "./theme";
+import AppRoutes from "./routes";
 import { BrowserRouter } from "react-router-dom";
-import logo from "./logo.svg";
-import "./App.css";
-import Signup from "./components/Signup";
+import AlertDialog, { AlertProvider } from "./components/alert-dialog";
+import { snackbarRef } from "./components/material-snackbar";
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="App">
-       <Signup />
-      </div>
-    </BrowserRouter>
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <AlertProvider>
+          <CssBaseline />
+          <Navbar />
+          <AppRoutes />
+          <AlertDialog />
+          <MaterialSnackbar ref={snackbarRef} />
+        </AlertProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
