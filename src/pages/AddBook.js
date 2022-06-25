@@ -60,7 +60,7 @@ const AddBook = () => {
         lastId = id;
       }
 
-      setImages((oldImages) => [...oldImages, ...newImages]);
+      setImages((oldImages) => [...newImages]);
     }
   };
 
@@ -160,7 +160,6 @@ const AddBook = () => {
           >
             <input
               type="file"
-              multiple
               accept="image/*"
               style={{ display: 'none' }}
               ref={fileInput}
