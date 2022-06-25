@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { regEx, simpleChangeHandler } from "../utils";
 import UserPool from "../UserPool";
 
-const loginCognito = (formData, navigate) => {
+const loginCognito = (formData) => {
   const authenticationData = {
     Username: formData.email,
     Password: formData.password,
@@ -31,40 +31,19 @@ const loginCognito = (formData, navigate) => {
 
   cognitoUser.authenticateUser(authenticationDetails, {
     onSuccess: (result) => {
-      localStorage.setItem("AWS_JWT_TOKEN", result.idToken.jwtToken);
-      console.log("Login", "Login Successful!");
-      navigate("/");
+      var accessToken = result.getAccessToken().getJwtToken();
+      var idToken = result.idToken.jwtToken;
+      console.log("LoginSuccess", result);
+      console.log("LoginSuccess", accessToken);
+      console.log("LoginSuccess", idToken);
     },
     onFailure: (error) => {
-      console.log("Login", error);
+      console.log("LoginError", error);
     },
   });
 };
 
-// const saveUserToDb = async (token) => {
-//   try {
-//     const response = await axios.post(
-//       serverInfo.baseUrl + serverInfo.stagingUrl + serverInfo.createUser,
-//       {
-//         userId: "test",
-//         email: "testEmail",
-//         firstName: "Tasnim",
-//         lastName: "Khan",
-//       },
-//       {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//       }
-//     );
-
-//     console.log(response);
-//   } catch (error) {
-//     console.log(`Error: ${error.message}`);
-//   }
-// };
-
-const Login = () => {
+const ForgotPassword = () => {
   const navigate = useNavigate();
 
   // Email
@@ -80,33 +59,13 @@ const Login = () => {
     simpleChangeHandler
   );
 
-  // Password
-  const {
-    value: password,
-    isValid: passwordIsValid,
-    hasError: passwordHasError,
-    valueChangeHandler: passwordChangeHandler,
-    inputBlurHandler: passwordBlurHandler,
-    reset: resetPasswordInput,
-  } = useInput((value) => value.trim() !== "", simpleChangeHandler);
-
-  let formIsValid = false;
-
-  if (emailIsValid && passwordIsValid) {
-    formIsValid = true;
-  }
-
   // Form Submit Handler
   const formSubmissionHandler = (event) => {
     event.preventDefault();
 
-    loginCognito(
-      {
-        email: email,
-        password: password,
-      },
-      navigate
-    );
+    loginCognito({
+      email: email,
+    });
   };
 
   return (
@@ -139,22 +98,6 @@ const Login = () => {
             helperText={emailHasError && "Valid Email is required"}
           />
 
-          <TextField
-            id="password"
-            label="Password"
-            type="password"
-            variant="outlined"
-            fullWidth={true}
-            sx={{
-              mt: 2,
-            }}
-            value={password}
-            onChange={passwordChangeHandler}
-            onBlur={passwordBlurHandler}
-            error={passwordHasError}
-            helperText={passwordHasError && "Password is required"}
-          />
-
           <Box
             sx={{ mt: 4, position: "relative" }}
             display="flex"
@@ -164,30 +107,21 @@ const Login = () => {
             <Button
               type="submit"
               variant="contained"
-              disabled={!formIsValid}
+              disabled={!emailIsValid}
               color="secondary"
             >
-              Login
+              Send Email
             </Button>
           </Box>
         </form>
         <Grid container justifyContent="flex-end">
-          <Grid item xs>
-            <Link
-              variant="body2"
-              onClick={() => navigate("/forgot-password")}
-              sx={{ cursor: "pointer" }}
-            >
-              Forgot password?
-            </Link>
-          </Grid>
           <Grid item>
             <Link
               variant="body2"
-              onClick={() => navigate("/signup")}
+              onClick={() => navigate("/login")}
               sx={{ cursor: "pointer" }}
             >
-              {"Don't have an account? Sign Up"}
+              {"Cancel"}
             </Link>
           </Grid>
         </Grid>
@@ -196,4 +130,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ForgotPassword;

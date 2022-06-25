@@ -13,22 +13,66 @@ import { CognitoUserAttribute } from "amazon-cognito-identity-js";
 import useInput from "../hooks/use-input";
 import { snackbar } from "../components";
 import { useNavigate } from "react-router-dom";
+import {
+  serverInfo,
+  regEx,
+  simpleChangeHandler,
+  onlyTextChangeHandler,
+} from "../utils";
+import axios from "axios";
 
-// Email Validation Regex
-const regex =
-  /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+const signUpCognito = (formData) => {
+  let attributeList = [
+    new CognitoUserAttribute({
+      Name: "given_name",
+      Value: formData.firstName,
+    }),
+    new CognitoUserAttribute({
+      Name: "family_name",
+      Value: formData.lastName,
+    }),
+    new CognitoUserAttribute({
+      Name: "email",
+      Value: formData.email,
+    }),
+  ];
 
-// Handle input changes
-const simpleChangeHandler = (event) => {
-  return event.target.value;
+  UserPool.signUp(
+    formData.email,
+    formData.password,
+    attributeList,
+    null,
+    (error, data) => {
+      if (error) {
+        console.error(error);
+        snackbar.current.showSnackbar(true, error.message);
+      }
+      console.log(data);
+      snackbar.current.showSnackbar(true, `Registration Successful!`);
+      saveUserToDb(formData, data.userSub);
+    }
+  );
 };
 
-// Handle changes and only accept alphabets
-const onlyTextChangeHandler = (event) => {
-  return event.target.value.replace(/[^a-z]/gi, "");
+const saveUserToDb = async (data, userId) => {
+  try {
+    const response = await axios.post(
+      serverInfo.baseUrl + serverInfo.stagingUrl + serverInfo.createUser,
+      {
+        userId: userId,
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+      }
+    );
+
+    console.log(response);
+  } catch (error) {
+    console.log(`Error: ${error.message}`);
+  }
 };
 
-const Signup = () => {
+const Signup = (data) => {
   const navigate = useNavigate();
   // First Name
   const {
@@ -58,7 +102,10 @@ const Signup = () => {
     valueChangeHandler: emailChangeHandler,
     inputBlurHandler: emailBlurHandler,
     reset: resetEmailInput,
-  } = useInput((value) => regex.test(value) === true, simpleChangeHandler);
+  } = useInput(
+    (value) => regEx.email.test(value) === true,
+    simpleChangeHandler
+  );
 
   // Password
   const {
@@ -95,28 +142,11 @@ const Signup = () => {
   const formSubmissionHandler = (event) => {
     event.preventDefault();
 
-    let attributeList = [
-      new CognitoUserAttribute({
-        Name: "given_name",
-        Value: firstName,
-      }),
-      new CognitoUserAttribute({
-        Name: "family_name",
-        Value: lastName,
-      }),
-      new CognitoUserAttribute({
-        Name: "email",
-        Value: email,
-      }),
-    ];
-
-    UserPool.signUp(email, password, attributeList, null, (err, data) => {
-      if (err) {
-        console.error(err);
-        snackbar.current.showSnackbar(true, err.message);
-      }
-      console.log(data);
-      snackbar.current.showSnackbar(true, `Registration Successful!`);
+    signUpCognito({
+      email: email,
+      password: password,
+      firstName: firstName,
+      lastName: lastName,
     });
   };
 
