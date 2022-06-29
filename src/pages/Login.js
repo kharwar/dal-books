@@ -31,7 +31,8 @@ const loginCognito = (formData, navigate) => {
 
   cognitoUser.authenticateUser(authenticationDetails, {
     onSuccess: (result) => {
-      localStorage.setItem("AWS_JWT_TOKEN", result.idToken.jwtToken);
+      sessionStorage.setItem("AWS_JWT_TOKEN", result.idToken.jwtToken);
+      sessionStorage.setItem("USER_ID", result.idToken.payload.sub);
       console.log("Login", "Login Successful!");
       navigate("/");
     },
