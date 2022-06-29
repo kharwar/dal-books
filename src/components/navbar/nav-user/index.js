@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Avatar,
   Box,
@@ -10,11 +10,13 @@ import {
 } from "@mui/material";
 import { loggedInUser } from "../../../data";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../context";
 
 const settings = ["Profile", "Logout"];
 
 const NavUser = () => {
   const navigate = useNavigate();
+  const { isLogin, setLogin } = useContext(AuthContext);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
   const handleOpenUserMenu = (event) => {
@@ -23,6 +25,9 @@ const NavUser = () => {
 
   const handleCloseUserMenu = (setting) => {
     if (setting === "Logout") {
+      localStorage.removeItem("AWS_JWT_TOKEN");
+      localStorage.removeItem("USER_ID");
+      setLogin(false);
       navigate("/login");
     }
     setAnchorElUser(null);

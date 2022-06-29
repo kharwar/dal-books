@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import {
   Box,
   Grid,
@@ -13,8 +14,9 @@ import { AuthenticationDetails, CognitoUser } from "amazon-cognito-identity-js";
 import { useNavigate } from "react-router-dom";
 import { regEx, simpleChangeHandler } from "../utils";
 import UserPool from "../UserPool";
+import { AuthContext } from "../context";
 
-const loginCognito = (formData, navigate) => {
+const loginCognito = (formData, navigate, setLogin) => {
   const authenticationData = {
     Username: formData.email,
     Password: formData.password,
@@ -31,9 +33,10 @@ const loginCognito = (formData, navigate) => {
 
   cognitoUser.authenticateUser(authenticationDetails, {
     onSuccess: (result) => {
-      sessionStorage.setItem("AWS_JWT_TOKEN", result.idToken.jwtToken);
-      sessionStorage.setItem("USER_ID", result.idToken.payload.sub);
+      localStorage.setItem("AWS_JWT_TOKEN", result.idToken.jwtToken);
+      localStorage.setItem("USER_ID", result.idToken.payload.sub);
       console.log("Login", "Login Successful!");
+      setLogin(true);
       navigate("/");
     },
     onFailure: (error) => {
@@ -66,6 +69,7 @@ const loginCognito = (formData, navigate) => {
 // };
 
 const Login = () => {
+  const { isLogin, setLogin } = useContext(AuthContext);
   const navigate = useNavigate();
 
   // Email
@@ -106,7 +110,8 @@ const Login = () => {
         email: email,
         password: password,
       },
-      navigate
+      navigate,
+      setLogin
     );
   };
 
