@@ -1,23 +1,20 @@
 import { useState, useRef } from "react";
 import {
-  Avatar,
   Paper,
-  Typography,
   Stack,
   IconButton,
   Button,
   Box,
   styled,
-  CircularProgress,
-  Snackbar,
-  Alert,
   TextField,
   Container,
-  Slider,
   Grid,
 } from "@mui/material";
 import { DeleteRounded, ImageRounded } from "@mui/icons-material";
 import "./Addbook.css";
+import { storage } from "../config/firebase";
+import { ref, uploadBytes, getDownloadURL } from "@firebase/storage";
+import { uuidv4 } from "@firebase/util";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -33,6 +30,7 @@ const AddBook = () => {
   const [author, setAuthor] = useState("");
   const [point, setPoint] = useState(10);
   const [images, setImages] = useState([]);
+  const [imageUrl, setImageUrl] = useState("");
 
   const fileInput = useRef(null);
 
@@ -72,7 +70,28 @@ const AddBook = () => {
       }
 
       setImages((oldImages) => [...newImages]);
+      uploadImage(fileList[0]);
     }
+  };
+
+  const uploadImage = (file) => {
+    // Make the path unique by adding UUID before filename maybe.
+    const filePath = "/bookImgs/" + uuidv4() + file.name;
+    const storageRef = ref(storage, filePath);
+
+    uploadBytes(storageRef, file)
+      .then(() => {
+        getDownloadURL(storageRef)
+          .then((url) => {
+            setImageUrl(url);
+          })
+          .catch((error) => {
+            console.error(error.message);
+          });
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
   };
 
   const onImageChange = (e) => {
