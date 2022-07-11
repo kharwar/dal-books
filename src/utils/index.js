@@ -21,3 +21,8 @@ export const simpleChangeHandler = (event) => {
 export const onlyTextChangeHandler = (event) => {
   return event.target.value.replace(/[^a-z]/gi, "");
 };
+
+// Handle changes and only accept integers
+export const onlyIntegerChangeHandler = (event) => {
+  return event.target.value.replace(/[^0-9]/gi, "");
+};

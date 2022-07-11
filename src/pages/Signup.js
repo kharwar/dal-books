@@ -21,7 +21,7 @@ import {
 } from "../utils";
 import axios from "axios";
 
-const signUpCognito = (formData) => {
+const signUpCognito = (formData, navigate) => {
   let attributeList = [
     new CognitoUserAttribute({
       Name: "given_name",
@@ -44,17 +44,16 @@ const signUpCognito = (formData) => {
     null,
     (error, data) => {
       if (error) {
-        console.error(error);
-        snackbar.current.showSnackbar(true, error.message);
+        snackbar.current.showSnackbar(true, error.name);
+        return;
       }
-      console.log(data);
-      snackbar.current.showSnackbar(true, `Registration Successful!`);
-      saveUserToDb(formData, data.userSub);
+      snackbar.current.showSnackbar(true, "Registration Successful!");
+      saveUserToDb(formData, data.userSub, navigate);
     }
   );
 };
 
-const saveUserToDb = async (data, userId) => {
+const saveUserToDb = async (data, userId, navigate) => {
   try {
     const response = await axios.post(
       serverInfo.baseUrl + serverInfo.stagingUrl + serverInfo.createUser,
@@ -65,14 +64,18 @@ const saveUserToDb = async (data, userId) => {
         lastName: data.lastName,
       }
     );
-
+    snackbar.current.showSnackbar(
+      true,
+      "Please check email for verification email!"
+    );
+    navigate("/login");
     console.log(response);
   } catch (error) {
-    console.log(`Error: ${error.message}`);
+    console.log(`Error: ${error}`);
   }
 };
 
-const Signup = (data) => {
+const Signup = () => {
   const navigate = useNavigate();
   // First Name
   const {
@@ -142,12 +145,15 @@ const Signup = (data) => {
   const formSubmissionHandler = (event) => {
     event.preventDefault();
 
-    signUpCognito({
-      email: email,
-      password: password,
-      firstName: firstName,
-      lastName: lastName,
-    });
+    signUpCognito(
+      {
+        email: email,
+        password: password,
+        firstName: firstName,
+        lastName: lastName,
+      },
+      navigate
+    );
   };
 
   return (

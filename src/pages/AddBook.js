@@ -1,22 +1,33 @@
 import { useState, useRef } from "react";
 import {
-  Avatar, Paper, Typography,
-  Stack, IconButton, Button, Box, styled,
-  CircularProgress, Snackbar, Alert, TextField, Container, Slider, Grid
-} from '@mui/material';
-import { DeleteRounded, ImageRounded } from '@mui/icons-material';
-import './Addbook.css';
+  Avatar,
+  Paper,
+  Typography,
+  Stack,
+  IconButton,
+  Button,
+  Box,
+  styled,
+  CircularProgress,
+  Snackbar,
+  Alert,
+  TextField,
+  Container,
+  Slider,
+  Grid,
+} from "@mui/material";
+import { DeleteRounded, ImageRounded } from "@mui/icons-material";
+import "./Addbook.css";
 
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
   ...theme.typography.body2,
   padding: theme.spacing(1),
-  textAlign: 'center',
+  textAlign: "center",
   color: theme.palette.text.secondary,
 }));
 
 const AddBook = () => {
-
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [author, setAuthor] = useState("");
@@ -65,7 +76,6 @@ const AddBook = () => {
   };
 
   const onImageChange = (e) => {
-
     if (fileInput.current != null) {
       fileInput.current.click();
     }
@@ -76,15 +86,16 @@ const AddBook = () => {
     console.log("book added");
   };
 
-
   return (
     <form onSubmit={formSubmitHandler}>
       <Container maxWidth="md">
-        <Paper sx={{ m: '50px', p: '30px' }}>
-
-
+        <Paper sx={{ m: "50px", p: "30px" }}>
           <Stack direction="column" spacing={2}>
-            <TextField id="standard-Title" label="Title" variant="standard" required
+            <TextField
+              id="standard-Title"
+              label="Title"
+              variant="standard"
+              required
               margin="normal"
               value={title}
               InputProps={{ style: { fontSize: 30 } }}
@@ -102,43 +113,36 @@ const AddBook = () => {
               variant="standard"
             />
 
-
             <Grid container spacing={2}>
               <Grid item xs={6}>
-
-                <TextField id="standard-Title" label="Author" variant="standard"
+                <TextField
+                  id="standard-Title"
+                  label="Author"
+                  variant="standard"
                   margin="normal"
                   value={author}
                   onChange={handleAuthorChange}
                 />
-
               </Grid>
               <Grid item xs={6}>
-
-                <TextField id="standard-Title" label="Points" variant="standard"
+                <TextField
+                  id="standard-Title"
+                  label="Points"
+                  variant="standard"
                   margin="normal"
                   value={point}
                   onChange={handlePointChange}
                 />
-
               </Grid>
             </Grid>
-
-
-
           </Stack>
           <br />
 
-          {images.length > 0 &&
+          {images.length > 0 && (
             <Box className="img-list">
-              {images.map((image, index) =>
-                <div className="img-container" key={index + ''}>
-                  <img
-                    className="img"
-                    src={image}
-                    width="350"
-                    height="350"
-                  />
+              {images.map((image, index) => (
+                <div className="img-container" key={index + ""}>
+                  <img className="img" src={image} width="350" height="350" />
                   <IconButton
                     sx={styling.btnDelete}
                     onClick={() => onDeleteImage(image)}
@@ -146,49 +150,27 @@ const AddBook = () => {
                     <DeleteRounded />
                   </IconButton>
                 </div>
-              )}
+              ))}
             </Box>
-          }
+          )}
 
-
-
-
-
-          <Stack
-            direction="row"
-            sx={styling.btnContainer}
-          >
+          <Stack direction="row" sx={styling.btnContainer}>
             <input
               type="file"
               accept="image/*"
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               ref={fileInput}
               onChange={onImageSelect}
             />
-            <IconButton
-              onClick={onImageChange}
-            >
+            <IconButton onClick={onImageChange}>
               <ImageRounded fontSize="medium" />
             </IconButton>
-
-
-
-
-            <Box
-              sx={{ m: 1, position: 'relative' }}
-            >
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{
-                  backgroundColor: '#455A64'
-                }}>
+            <Box sx={{ m: 1, position: "relative" }}>
+              <Button type="submit" variant="contained" color="secondary">
                 Add Book
               </Button>
-
             </Box>
           </Stack>
-
         </Paper>
       </Container>
     </form>
@@ -197,23 +179,21 @@ const AddBook = () => {
 
 export default AddBook;
 
-
 const styling = {
   btnDelete: {
-    position: 'absolute',
-    top: '2%',
-    right: '2%',
-    backgroundColor: 'lightgrey'
+    position: "absolute",
+    top: "2%",
+    right: "2%",
   },
   progress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: '-12px',
-    marginLeft: '-12px',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: "-12px",
+    marginLeft: "-12px",
   },
   btnContainer: {
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  }
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
 };

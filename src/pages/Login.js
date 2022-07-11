@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { regEx, simpleChangeHandler } from "../utils";
 import UserPool from "../UserPool";
 import { AuthContext } from "../context";
+import { snackbar } from "../components";
 
 const loginCognito = (formData, navigate, setLogin) => {
   const authenticationData = {
@@ -35,12 +36,12 @@ const loginCognito = (formData, navigate, setLogin) => {
     onSuccess: (result) => {
       localStorage.setItem("AWS_JWT_TOKEN", result.idToken.jwtToken);
       localStorage.setItem("USER_ID", result.idToken.payload.sub);
-      console.log("Login", "Login Successful!");
+      snackbar.current.showSnackbar(true, result.message);
       setLogin(true);
       navigate("/");
     },
     onFailure: (error) => {
-      console.log("Login", error);
+      snackbar.current.showSnackbar(true, error.message);
     },
   });
 };
