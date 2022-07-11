@@ -1,26 +1,21 @@
-import {
-  Paper,
-  Typography,
-  Container,
-} from "@mui/material";
+import { Paper, Grid, Container } from "@mui/material";
+import BookTile from "../components/book-tile";
+import { books } from "../data";
 
 const Home = () => {
   console.log(sessionStorage.getItem("AWS_JWT_TOKEN"));
   console.log(sessionStorage.getItem("USER_ID"));
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="lg">
       <Paper sx={{ m: "50px", p: "30px" }}>
-        <Typography
-          variant="h5"
-          component="h5"
-          sx={{ lineHeight: 1.2, mb: 2 }}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          Home
-        </Typography>
+        <Grid container spacing={3} rowGap={2}>
+          {books.map((book) => (
+            <Grid item xs={4}>
+              <BookTile key={book.id} {...book} />
+            </Grid>
+          ))}
+        </Grid>
       </Paper>
     </Container>
   );
