@@ -15,6 +15,11 @@ import "./Addbook.css";
 import { storage } from "../config/firebase";
 import { ref, uploadBytes, getDownloadURL } from "@firebase/storage";
 import { uuidv4 } from "@firebase/util";
+import { serverInfo, simpleChangeHandler, onlyIntegerChangeHandler } from "../utils";
+import useInput from "../hooks/use-input";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { snackbar } from "../components";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -25,30 +30,52 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const AddBook = () => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [author, setAuthor] = useState("");
-  const [point, setPoint] = useState(10);
+  const navigate = useNavigate();
+  // Title
+  const {
+    value: title,
+    isValid: titleIsValid,
+    hasError: titleHasError,
+    valueChangeHandler: titleChangeHandler,
+    inputBlurHandler: titleBlurHandler,
+    reset: resetTitleInput,
+  } = useInput((value) => value.trim() !== "", simpleChangeHandler);
+
+  // Description
+  const {
+    value: description,
+    isValid: descriptionIsValid,
+    hasError: descriptionHasError,
+    valueChangeHandler: descriptionChangeHandler,
+    inputBlurHandler: descriptionBlurHandler,
+    reset: resetDescriptionInput,
+  } = useInput((value) => value.trim() !== "", simpleChangeHandler);
+
+  // Author
+  const {
+    value: author,
+    isValid: authorIsValid,
+    hasError: authorHasError,
+    valueChangeHandler: authorChangeHandler,
+    inputBlurHandler: authorBlurHandler,
+    reset: resetAuthorInput,
+  } = useInput((value) => value.trim() !== "", simpleChangeHandler);
+
+  // Points
+  const {
+    value: points,
+    isValid: pointsIsValid,
+    hasError: pointsHasError,
+    valueChangeHandler: pointsChangeHandler,
+    inputBlurHandler: pointsBlurHandler,
+    reset: resetPointsInput,
+  } = useInput((value) => value > 0 && value < 5, onlyIntegerChangeHandler);
+
   const [images, setImages] = useState([]);
   const [imageUrl, setImageUrl] = useState("");
 
   const fileInput = useRef(null);
 
-  const handleTitleChange = (event) => {
-    setTitle(event.target.value);
-  };
-
-  const handleDescriptionChange = (event) => {
-    setDescription(event.target.value);
-  };
-
-  const handleAuthorChange = (event) => {
-    setAuthor(event.target.value);
-  };
-
-  const handlePointChange = (event) => {
-    setPoint(event.target.value);
-  };
 
   const onDeleteImage = (url) => {
     const filteredImages = images.filter((image) => image != url);
@@ -100,9 +127,52 @@ const AddBook = () => {
     }
   };
 
+  const saveBookToDb = async () => {
+    const jwtToken = localStorage.getItem("AWS_JWT_TOKEN");
+    const userId = localStorage.getItem("USER_ID");
+
+    try {
+      const response = await axios.post(
+        serverInfo.baseUrl + serverInfo.stagingUrl + serverInfo.createBook,
+        {
+          title: title,
+          description: description,
+          author: author,
+          points: points,
+          imageUrl: imageUrl,
+          userId: userId,
+          isRented: false
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        }
+      );
+      snackbar.current.showSnackbar(true, response.message);
+      navigate("/home");
+    } catch (error) {
+      console.log(`Error: ${error}`);
+      snackbar.current.showSnackbar(true, error.message);
+    }
+  };
+
+  let formIsValid = false;
+
+  if (
+    titleIsValid &&
+    descriptionIsValid &&
+    authorIsValid &&
+    pointsIsValid &&
+    imageUrl.trim() !== ""
+  ) {
+    formIsValid = true;
+  }
+
   const formSubmitHandler = (event) => {
     event.preventDefault();
-    console.log("book added");
+    saveBookToDb();
+    
   };
 
   return (
@@ -117,9 +187,12 @@ const AddBook = () => {
               required
               margin="normal"
               value={title}
+              onChange={titleChangeHandler}
+              onBlur={titleBlurHandler}
+              error={titleHasError}
+              helperText={titleHasError && "Title is required"}
               InputProps={{ style: { fontSize: 30 } }}
               InputLabelProps={{ style: { fontSize: 20 } }}
-              onChange={handleTitleChange}
             />
 
             <TextField
@@ -128,7 +201,10 @@ const AddBook = () => {
               multiline
               maxRows={4}
               value={description}
-              onChange={handleDescriptionChange}
+              onChange={descriptionChangeHandler}
+              onBlur={descriptionBlurHandler}
+              error={descriptionHasError}
+              helperText={descriptionHasError && "Description is required"}
               variant="standard"
             />
 
@@ -140,7 +216,10 @@ const AddBook = () => {
                   variant="standard"
                   margin="normal"
                   value={author}
-                  onChange={handleAuthorChange}
+                  onChange={authorChangeHandler}
+                  onBlur={authorBlurHandler}
+                  error={authorHasError}
+                  helperText={authorHasError && "Author is required"}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -149,8 +228,11 @@ const AddBook = () => {
                   label="Points"
                   variant="standard"
                   margin="normal"
-                  value={point}
-                  onChange={handlePointChange}
+                  value={points}
+                  onChange={pointsChangeHandler}
+                  onBlur={pointsBlurHandler}
+                  error={pointsHasError}
+                  helperText={pointsHasError && "Points should be between 1 - 4"}
                 />
               </Grid>
             </Grid>
@@ -185,7 +267,7 @@ const AddBook = () => {
               <ImageRounded fontSize="medium" />
             </IconButton>
             <Box sx={{ m: 1, position: "relative" }}>
-              <Button type="submit" variant="contained" color="secondary">
+              <Button type="submit" variant="contained" color="secondary" disabled={!formIsValid}>
                 Add Book
               </Button>
             </Box>

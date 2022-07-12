@@ -3,6 +3,7 @@ export const serverInfo = {
     "https://n20q8gasae.execute-api.us-east-1.amazonaws.com",
   stagingUrl: "/staging",
   createUser: "/user/create",
+  createBook: "/book/create"
 };
 
 export const regEx = {
