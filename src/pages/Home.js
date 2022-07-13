@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Paper, Grid, Container } from "@mui/material";
 import BookTile from "../components/book-tile";
-import { books } from "../data";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { snackbar } from "../components";

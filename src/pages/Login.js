@@ -16,6 +16,8 @@ import { regEx, simpleChangeHandler } from "../utils";
 import UserPool from "../UserPool";
 import { AuthContext } from "../context";
 import { snackbar } from "../components";
+import axios from "axios";
+import { serverInfo } from "../utils";
 
 const loginCognito = (formData, navigate, setLogin) => {
   const authenticationData = {
@@ -36,16 +38,46 @@ const loginCognito = (formData, navigate, setLogin) => {
     onSuccess: (result) => {
       localStorage.setItem("AWS_JWT_TOKEN", result.idToken.jwtToken);
       localStorage.setItem("USER_ID", result.idToken.payload.sub);
+
       console.log(result.idToken.jwtToken);
 
       snackbar.current.showSnackbar(true, result.message);
-      setLogin(true);
-      navigate("/");
+      getLoggedInUserDetails(navigate, setLogin);
     },
     onFailure: (error) => {
       snackbar.current.showSnackbar(true, error.message);
     },
   });
+};
+
+const getLoggedInUserDetails = async (navigate, setLogin) => {
+  const jwtToken = localStorage.getItem("AWS_JWT_TOKEN");
+  const userId = localStorage.getItem("USER_ID");
+
+  try {
+    const response = await axios.get(
+      serverInfo.baseUrl + serverInfo.users + "/" + userId,
+      {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "content-type": "application/json",
+        },
+      }
+    );
+
+    localStorage.setItem("USER_FIRST_NAME", response.data.data.Item.firstName);
+    localStorage.setItem("USER_LAST_NAME", response.data.data.Item.lastName);
+    localStorage.setItem("USER_EMAIL", response.data.data.Item.email);
+    localStorage.setItem("USER_POINTS", response.data.data.Item.points);
+
+    console.log(response.data);
+
+    setLogin(true);
+    navigate("/");
+  } catch (error) {
+    console.log(`Error: ${error}`);
+    snackbar.current.showSnackbar(true, error.message);
+  }
 };
 
 const Login = () => {
