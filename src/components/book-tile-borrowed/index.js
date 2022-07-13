@@ -70,37 +70,6 @@ const updateBookRented = async (props, setRented) => {
   }
 };
 
-const returnBookRented = async (props, setRented) => {
-  const jwtToken = localStorage.getItem("AWS_JWT_TOKEN");
-  const userId = localStorage.getItem("USER_ID");
-
-  try {
-    const response = await axios.put(
-      serverInfo.baseUrl + serverInfo.books,
-      {
-        bookId: props.bookId,
-        title: props.title,
-        description: props.description,
-        author: props.author,
-        points: props.points,
-        imageUrl: props.imageUrl,
-        userId: props.userId,
-        rentedBy: "",
-        isRented: false,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-          "content-type": "application/json",
-        },
-      }
-    );
-    setRented(false);
-  } catch (error) {
-    console.log(`Error: ${error}`);
-  }
-};
-
 const updateUser = async (userPoints) => {
   const jwtToken = localStorage.getItem("AWS_JWT_TOKEN");
   const userId = localStorage.getItem("USER_ID");
@@ -109,13 +78,16 @@ const updateUser = async (userPoints) => {
   const email = localStorage.getItem("USER_EMAIL");
 
   try {
-    const response = await axios.post(serverInfo.baseUrl + serverInfo.users, {
-      userId: userId,
-      email: email,
-      firstName: firstName,
-      lastName: lastName,
-      points: userPoints,
-    });
+    const response = await axios.post(
+      serverInfo.baseUrl + serverInfo.users,
+      {
+        userId: userId,
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        points: userPoints
+      }
+    );
 
     localStorage.setItem("USER_POINTS", userPoints);
   } catch (error) {
@@ -124,7 +96,6 @@ const updateUser = async (userPoints) => {
 };
 
 function BookTile(props) {
-  const fromBorrowedPage = props.borrowedPage ? true : false;
   const [isRented, setRented] = useState(props.isRented);
   const [postedByMe, setPostedByMe] = useState(false);
   const [postedUser, setPostedUser] = useState("");
@@ -148,17 +119,12 @@ function BookTile(props) {
       return;
     }
     const newPoints = loggedInUserPoints - props.points;
-
+    
     setUserPoints(newPoints);
 
     updateBookRented(props, setRented);
     updateUser(newPoints);
     snackbar.current.showSnackbar(true, "Book Successfully Borrowed!");
-  };
-
-  const returnClickHandler = (event) => {
-    returnBookRented(props, setRented);
-    snackbar.current.showSnackbar(true, "Book Returned Borrowed!");
   };
 
   return (
@@ -200,29 +166,17 @@ function BookTile(props) {
           </Grid>
 
           <Grid item xs={6} sx={{ display: { xs: "none", sm: "block" } }}>
-            {!fromBorrowedPage && (
-              <Button
-                fullWidth
-                variant="contained"
-                color="secondary"
-                disabled={isRented || postedByMe}
-                onClick={borrowClickHandler}
-              >
-                {isRented && !postedByMe && "Borrowed"}
-                {postedByMe && "My Book"}
-                {!isRented && !postedByMe && "Borrow"}
-              </Button>
-            )}
-            {fromBorrowedPage && (
-              <Button
-                fullWidth
-                variant="contained"
-                color="secondary"
-                onClick={returnClickHandler}
-              >
-                Return Book
-              </Button>
-            )}
+            <Button
+              fullWidth
+              variant="contained"
+              color="secondary"
+              disabled={isRented || postedByMe}
+              onClick={borrowClickHandler}
+            >
+              {isRented && !postedByMe && "Borrowed"}
+              {postedByMe && "My Book"}
+              {!isRented && !postedByMe && "Borrow"}
+            </Button>
           </Grid>
         </Grid>
       </CardActions>

@@ -1,7 +1,7 @@
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "../context";
 import { Navbar } from "../components";
-import { Home, Login, Signup, ForgotPassword, AddBook, Review } from "../pages";
+import { Home, Login, Signup, ForgotPassword, AddBook, Review, BorrowedBooks } from "../pages";
 
 const AppRoutes = () => {
   const { isLogin } = useAuth();
@@ -30,6 +30,7 @@ const ProtectedRoutes = () => {
     <Routes>
       <Route element={<WithNavbar />}>
         <Route path="/" element={<Home />} />
+        <Route path="/borrowed-books" element={<BorrowedBooks />} />
         <Route path="/add-book" element={<AddBook />} />
         <Route path="/review" element={<Review />} />
         <Route path="*" element={<Home />} />

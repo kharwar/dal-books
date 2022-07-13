@@ -16,6 +16,9 @@ const NavMenuPages = (props) => {
     if (page && page === "Home") {
       navigate("/");
     }
+    if (page && page === "My Borrowed Books") {
+      navigate("/borrowed-books");
+    }
     setAnchorElNav(null);
   };
 

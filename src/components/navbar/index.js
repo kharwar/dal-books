@@ -6,7 +6,7 @@ import NavCreateButton from "./nav-create-button";
 import NavUser from "./nav-user";
 import { useNavigate } from "react-router-dom";
 
-const pages = ["Home"];
+const pages = ["Home", "My Borrowed Books"];
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -14,6 +14,9 @@ const Navbar = () => {
   const navigateToPage = (page) => {
     if (page === "Home") {
       navigate("/");
+    }
+    if (page === "My Borrowed Books") {
+      navigate("/borrowed-books");
     }
   };
 
