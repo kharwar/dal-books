@@ -8,6 +8,7 @@ import { serverInfo } from "../utils";
 
 const getAllBooksFromDb = async (setPostedBooks) => {
   const jwtToken = localStorage.getItem("AWS_JWT_TOKEN");
+  const userId = localStorage.getItem("USER_ID");
 
   try {
     const response = await axios.get(serverInfo.baseUrl + serverInfo.books, {
@@ -16,7 +17,11 @@ const getAllBooksFromDb = async (setPostedBooks) => {
         "content-type": "application/json",
       },
     });
-    setPostedBooks(response.data.response.Items);
+
+    const allBooks = response.data.response.Items;
+    setPostedBooks(
+      allBooks.filter((book) => book.rentedBy && book.rentedBy === userId)
+    );
   } catch (error) {
     console.log(`Error: ${error}`);
     snackbar.current.showSnackbar(true, error.message);
@@ -36,7 +41,7 @@ const BorrowedBooks = () => {
         <Grid container spacing={3} rowGap={2}>
           {postedBooks.map((book) => (
             <Grid key={book.bookId} item xs={4}>
-              <BookTile key={book.bookId} {...book} borrowedPage={true}/>
+              <BookTile key={book.bookId} {...book} borrowedPage={true} />
             </Grid>
           ))}
         </Grid>
