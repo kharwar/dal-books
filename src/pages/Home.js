@@ -7,20 +7,18 @@ import { useNavigate } from "react-router-dom";
 import { snackbar } from "../components";
 import { serverInfo } from "../utils";
 
-const getAllBooksFromDb = async () => {
+const getAllBooksFromDb = async (setPostedBooks) => {
   const jwtToken = localStorage.getItem("AWS_JWT_TOKEN");
 
   try {
-    const response = await axios.get(
-      serverInfo.baseUrl + serverInfo.books,
-      {
-        headers: {
-          'Authorization': `Bearer ${jwtToken}`,
-          'content-type': 'application/json'
-        },
-      }
-    );
-    snackbar.current.showSnackbar(true, response.message);
+    const response = await axios.get(serverInfo.baseUrl + serverInfo.books, {
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        "content-type": "application/json",
+      },
+    });
+    console.log(response.data);
+    setPostedBooks(response.data.response.Items);
   } catch (error) {
     console.log(`Error: ${error}`);
     snackbar.current.showSnackbar(true, error.message);
@@ -31,17 +29,16 @@ const Home = () => {
   const [postedBooks, setPostedBooks] = useState([]);
 
   useEffect(() => {
-    getAllBooksFromDb();
+    getAllBooksFromDb(setPostedBooks);
   }, []);
-
 
   return (
     <Container maxWidth="lg">
       <Paper sx={{ m: "50px", p: "30px" }}>
         <Grid container spacing={3} rowGap={2}>
           {postedBooks.map((book) => (
-            <Grid item xs={4}>
-              <BookTile key={book.id} {...book} />
+            <Grid key={book.bookId} item xs={4}>
+              <BookTile key={book.bookId} {...book} />
             </Grid>
           ))}
         </Grid>

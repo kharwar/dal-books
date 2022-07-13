@@ -16,10 +16,10 @@ import { Favorite, ShoppingCart } from "@mui/icons-material";
 function MediaCard(props) {
   return (
     <Card>
-      <CardActionArea component={Link} to={`/book/${props.id}`}>
+      <CardActionArea component={Link} to={`/book/${props.bookId}`}>
         <CardMedia
           component="img"
-          image={props.url}
+          image={props.imageUrl}
           sx={{
             height: {
               xs: 150,
