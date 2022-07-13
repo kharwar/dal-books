@@ -147,7 +147,7 @@ const BookTile = (props) => {
   }, []);
 
   const borrowClickHandler = (event) => {
-    const loggedInUserPoints = localStorage.getItem("USER_POINTS");
+    const loggedInUserPoints = +localStorage.getItem("USER_POINTS");
 
     if (props.points > loggedInUserPoints) {
       snackbar.current.showSnackbar(true, "Not enough points!");
