@@ -2,6 +2,7 @@ export const serverInfo = {
   baseUrl: "https://033nm4ea2c.execute-api.us-east-1.amazonaws.com/api",
   users: "/users",
   books: "/books",
+  reviews: "/reviews"
 };
 
 export const regEx = {

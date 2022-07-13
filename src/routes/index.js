@@ -10,6 +10,7 @@ import {
   Review,
   Verification,
   BorrowedBooks,
+  BookReviews
 } from "../pages";
 
 const AppRoutes = () => {
@@ -42,7 +43,8 @@ const ProtectedRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/borrowed-books" element={<BorrowedBooks />} />
         <Route path="/add-book" element={<AddBook />} />
-        <Route path="/review" element={<Review />} />
+        <Route path="/add-review/:id" element={<Review />} />
+        <Route path="/book-reviews/:id" element={<BookReviews />} />
         <Route path="*" element={<Home />} />
       </Route>
     </Routes>

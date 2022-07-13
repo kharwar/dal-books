@@ -132,8 +132,6 @@ const AddBook = () => {
     const jwtToken = localStorage.getItem("AWS_JWT_TOKEN");
     const userId = localStorage.getItem("USER_ID");
 
-    console.log(jwtToken);
-
     try {
       const response = await axios.post(
         serverInfo.baseUrl + serverInfo.books,

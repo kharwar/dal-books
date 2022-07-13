@@ -9,12 +9,13 @@ import {
   Divider,
   Grid,
   Typography,
+  Link,
 } from "@mui/material";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import { serverInfo } from "../../utils";
 import { snackbar } from "../../components";
 import { PointsContext } from "../../context";
+import { useNavigate } from "react-router-dom";
 
 const getUserDetails = async (userId, setPostedUser) => {
   const jwtToken = localStorage.getItem("AWS_JWT_TOKEN");
@@ -113,7 +114,8 @@ const updateUser = async (user) => {
   }
 };
 
-function BookTile(props) {
+const BookTile = (props) => {
+  const navigate = useNavigate();
   const fromBorrowedPage = props.borrowedPage ? true : false;
   const { userPoints, setUserPoints } = useContext(PointsContext);
   const [isRented, setRented] = useState(props.isRented);
@@ -193,6 +195,19 @@ function BookTile(props) {
           }}
         />
         <CardContent>
+          {!fromBorrowedPage && (
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                <Link
+                  variant="body2"
+                  onClick={() => navigate("/book-reviews/" + props.bookId)}
+                  sx={{ cursor: "pointer" }}
+                >
+                  {"Reviews"}
+                </Link>
+              </Grid>
+            </Grid>
+          )}
           <Typography variant="h6">{props.title}</Typography>
           <Typography sx={{ color: "#888" }} variant="caption">
             {props.description}
@@ -211,9 +226,22 @@ function BookTile(props) {
       <CardActions>
         <Grid container>
           <Grid textAlign="center" item xs={6}>
-            <Typography sx={{ color: "#888" }} variant="overline">
-              {props.points} Points Needed
-            </Typography>
+            {!fromBorrowedPage && (
+              <Typography sx={{ color: "#888" }} variant="overline">
+                {props.points} Points Needed
+              </Typography>
+            )}
+            {fromBorrowedPage && (
+              <Link
+                variant="body2"
+                onClick={() => navigate("/add-review/" + props.bookId)}
+                sx={{ cursor: "pointer" }}
+              >
+                <Typography sx={{ color: "#2980b9" }} variant="overline">
+                  Add Review
+                </Typography>
+              </Link>
+            )}
           </Grid>
 
           <Grid item xs={6} sx={{ display: { xs: "none", sm: "block" } }}>
@@ -246,6 +274,6 @@ function BookTile(props) {
       </CardActions>
     </Card>
   );
-}
+};
 
 export default BookTile;

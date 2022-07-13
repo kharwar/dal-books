@@ -1,60 +1,66 @@
+import { useParams } from "react-router-dom";
 import {
   Container,
   Paper,
   TextField,
   Typography,
-  Rating,
-  styled,
-  Grid,
   Button,
   Box,
 } from "@mui/material";
 import useInput from "../hooks/use-input";
-import {
-  SentimentVerySatisfied,
-  SentimentSatisfiedAlt,
-  SentimentSatisfied,
-  SentimentDissatisfied,
-  SentimentVeryDissatisfied,
-} from "@mui/icons-material";
+import { serverInfo, simpleChangeHandler } from "../utils";
+import { useNavigate } from "react-router-dom";
+import { snackbar } from "../components";
+import axios from "axios";
+import { v4 } from "uuid";
+
+const saveReviewToDb = async (review, params, navigate) => {
+  const jwtToken = localStorage.getItem("AWS_JWT_TOKEN");
+  const userId = localStorage.getItem("USER_ID");
+
+  try {
+    const response = await axios.post(
+      serverInfo.baseUrl + serverInfo.reviews,
+      {
+        reviewId: v4(),
+        bookId: params.id,
+        userId: userId,
+        review: review,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      }
+    );
+    snackbar.current.showSnackbar(true, "Review Added!");
+    navigate("/borrowed-books");
+  } catch (error) {
+    console.log(`Error: ${error}`);
+    snackbar.current.showSnackbar(true, error.message);
+  }
+};
+
 const Review = () => {
-  const onlyTextChangeHandler = (e) => {
-    return e.target.value.replace(/[^a-zA-z0-9]/gi, "");
-  };
+  const params = useParams();
+  const navigate = useNavigate();
 
-  const simpleChangeHandler = (e) => {
-    return e.target.value;
-  };
-  //Book Name
+  // Review
   const {
-    value: bookName,
-    isValid: bookNameIsValid,
-    hasError: bookNameHasError,
-    valueChangeHandler: bookNameChangeHandler,
-    inputBlurHandler: bookNameBlurHandler,
-    reset: resetBookNameInput,
-  } = useInput((value) => value.trim() !== "", onlyTextChangeHandler);
+    value: review,
+    isValid: reviewIsValid,
+    hasError: reviewHasError,
+    valueChangeHandler: reviewChangeHandler,
+    inputBlurHandler: reviewBlurHandler,
+    reset: resetReviewInput,
+  } = useInput((value) => value.trim() !== "", simpleChangeHandler);
 
-  // Message
-  const {
-    value: message,
-    isValid: messageIsValid,
-    hasError: messageHasError,
-    valueChangeHandler: messageChangeHandler,
-    inputBlurHandler: messageBlurHandler,
-    reset: resetMessageInput,
-  } = useInput((value) => value.trim(), onlyTextChangeHandler);
+  let formIsValid = !reviewHasError;
 
   const formSubmissionHandler = (e) => {
     e.preventDefault();
-    console.log(bookName);
-    console.log(message);
-    // console.log(rating);
+    saveReviewToDb(review, params, navigate);
   };
-
-  let formIsValid = false;
-
-  formIsValid = bookNameIsValid;
 
   return (
     <Container maxWidth="md">
@@ -67,53 +73,25 @@ const Review = () => {
           alignItems="center"
           justifyContent="center"
         >
-          {"Review your book"}
+          {"Review the book"}
         </Typography>
-
         <form onSubmit={formSubmissionHandler}>
           <TextField
-            id="bookName"
-            label="Book Name"
-            variant="outlined"
-            fullWidth={true}
-            sx={{ mt: 2 }}
-            value={bookName}
-            onChange={bookNameChangeHandler}
-            onBlur={bookNameBlurHandler}
-            error={bookNameHasError}
-            helperText={bookNameHasError && "Book Name is Required."}
-          />
-          <TextField
-            id="message"
-            label="Message (Optional)"
+            id="review"
+            label="Review"
             variant="outlined"
             fullWidth={true}
             multiline={true}
-            rows={5}
-            sx={{ mt: 4 }}
-            value={message}
-            onChange={messageChangeHandler}
-          />
-          <Container
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+            sx={{
+              mt: 2,
             }}
-          >
-            <StyledRating
-              id="rating"
-              defaultValue={5}
-              IconContainerComponent={IconContainer}
-              getLabelText={(value) => customIcons[value].label}
-              highlightSelectedOnly
-              sx={{ mt: 5 }}
-              // value={rating}
-              // onChange={ratingChangeHandler}
-              // onBlur={ratingBlurHandler}
-              size="large"
-            />
-          </Container>
+            value={review}
+            onChange={reviewChangeHandler}
+            onBlur={reviewBlurHandler}
+            error={reviewHasError}
+            helperText={reviewHasError && "Review is required"}
+          />
+
           <Box
             sx={{ mt: 4, position: "relative" }}
             display="flex"
@@ -126,7 +104,7 @@ const Review = () => {
               disabled={!formIsValid}
               color="secondary"
             >
-              Submit
+              Post Review
             </Button>
           </Box>
         </form>
@@ -134,41 +112,5 @@ const Review = () => {
     </Container>
   );
 };
-
-function IconContainer(props) {
-  const { value, ...other } = props;
-  return (
-    <Container style={{ height: "20px" }} {...other}>
-      {customIcons[value].icon}
-    </Container>
-  );
-}
-const customIcons = {
-  1: {
-    icon: <SentimentVeryDissatisfied color="error" />,
-    label: "Very Dissatisfied",
-  },
-  2: {
-    icon: <SentimentDissatisfied color="error" />,
-    label: "Dissatisfied",
-  },
-  3: {
-    icon: <SentimentSatisfied color="warning" />,
-    label: "Neutral",
-  },
-  4: {
-    icon: <SentimentSatisfiedAlt color="success" />,
-    label: "Satisfied",
-  },
-  5: {
-    icon: <SentimentVerySatisfied color="success" />,
-    label: "Very Satisfied",
-  },
-};
-const StyledRating = styled(Rating)(({ theme }) => ({
-  "& .MuiRating-iconEmpty .MuiSvgIcon-root": {
-    color: theme.palette.action.disabled,
-  },
-}));
 
 export default Review;
