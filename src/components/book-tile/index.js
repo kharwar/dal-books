@@ -29,11 +29,7 @@ const getUserDetails = async (userId, setPostedUser) => {
         },
       }
     );
-    const name =
-      response.data.data.Item.firstName +
-      " " +
-      response.data.data.Item.lastName;
-    setPostedUser(name);
+    setPostedUser(response.data.data.Item);
   } catch (error) {
     console.log(`Error: ${error}`);
   }
@@ -101,23 +97,17 @@ const returnBookRented = async (props, setRented) => {
   }
 };
 
-const updateUser = async (userPoints) => {
+const updateUser = async (user) => {
   const jwtToken = localStorage.getItem("AWS_JWT_TOKEN");
-  const userId = localStorage.getItem("USER_ID");
-  const firstName = localStorage.getItem("USER_FIRST_NAME");
-  const lastName = localStorage.getItem("USER_LAST_NAME");
-  const email = localStorage.getItem("USER_EMAIL");
 
   try {
     const response = await axios.post(serverInfo.baseUrl + serverInfo.users, {
-      userId: userId,
-      email: email,
-      firstName: firstName,
-      lastName: lastName,
-      points: userPoints,
+      userId: user.userId,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      points: user.points,
     });
-
-    localStorage.setItem("USER_POINTS", userPoints);
   } catch (error) {
     console.log(`Error: ${error}`);
   }
@@ -125,17 +115,31 @@ const updateUser = async (userPoints) => {
 
 function BookTile(props) {
   const fromBorrowedPage = props.borrowedPage ? true : false;
+  const { userPoints, setUserPoints } = useContext(PointsContext);
   const [isRented, setRented] = useState(props.isRented);
   const [postedByMe, setPostedByMe] = useState(false);
-  const [postedUser, setPostedUser] = useState("");
-  const { userPoints, setUserPoints } = useContext(PointsContext);
-  const loggedInUserId = localStorage.getItem("USER_ID");
+
+  const [postedUser, setPostedUser] = useState({
+    userId: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    points: 0,
+  });
+
+  const loggedInUser = {
+    userId: localStorage.getItem("USER_ID"),
+    firstName: localStorage.getItem("USER_FIRST_NAME"),
+    lastName: localStorage.getItem("USER_LAST_NAME"),
+    email: localStorage.getItem("USER_EMAIL"),
+    points: userPoints,
+  };
 
   useEffect(() => {
-    if (props.userId !== loggedInUserId) {
+    if (props.userId !== loggedInUser.userId) {
       getUserDetails(props.userId, setPostedUser);
     } else {
-      setPostedUser("Me!!!");
+      setPostedUser(loggedInUser);
       setPostedByMe(true);
     }
   }, []);
@@ -147,18 +151,31 @@ function BookTile(props) {
       snackbar.current.showSnackbar(true, "Not enough points!");
       return;
     }
-    const newPoints = loggedInUserPoints - props.points;
 
-    setUserPoints(newPoints);
+    const loggedInUserNewPoints = loggedInUserPoints - props.points;
+    const postedUserPoints = +postedUser.points + +props.points;
+    const newPostedUser = {
+      userId: postedUser.userId,
+      firstName: postedUser.firstName,
+      lastName: postedUser.lastName,
+      email: postedUser.email,
+      points: postedUserPoints,
+    };
 
+    loggedInUser.points = loggedInUserNewPoints;
+    setPostedUser(newPostedUser);
+    setUserPoints(loggedInUserNewPoints);
     updateBookRented(props, setRented);
-    updateUser(newPoints);
+
+    localStorage.setItem("USER_POINTS", loggedInUserNewPoints);
+    updateUser(loggedInUser);
+    updateUser(newPostedUser);
     snackbar.current.showSnackbar(true, "Book Successfully Borrowed!");
   };
 
   const returnClickHandler = (event) => {
     returnBookRented(props, setRented);
-    snackbar.current.showSnackbar(true, "Book Returned Borrowed!");
+    snackbar.current.showSnackbar(true, "Book Returned Successfully!");
   };
 
   return (
@@ -186,7 +203,7 @@ function BookTile(props) {
           </Typography>
           <br />
           <Typography sx={{ color: "#888" }} variant="caption">
-            {`Posted by: ${postedUser}`}
+            {`Posted by: ${postedUser.firstName} ${postedUser.lastName}`}
           </Typography>
         </CardContent>
       </CardActionArea>
@@ -219,6 +236,7 @@ function BookTile(props) {
                 variant="contained"
                 color="secondary"
                 onClick={returnClickHandler}
+                disabled={!isRented}
               >
                 Return Book
               </Button>
