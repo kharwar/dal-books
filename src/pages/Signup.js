@@ -56,7 +56,7 @@ const signUpCognito = (formData, navigate) => {
 const saveUserToDb = async (data, userId, navigate) => {
   try {
     const response = await axios.post(
-      serverInfo.baseUrl + serverInfo.stagingUrl + serverInfo.createUser,
+      serverInfo.baseUrl + serverInfo.users,
       {
         userId: userId,
         email: data.email,

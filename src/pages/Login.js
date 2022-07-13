@@ -36,6 +36,8 @@ const loginCognito = (formData, navigate, setLogin) => {
     onSuccess: (result) => {
       localStorage.setItem("AWS_JWT_TOKEN", result.idToken.jwtToken);
       localStorage.setItem("USER_ID", result.idToken.payload.sub);
+      console.log(result.idToken.jwtToken);
+
       snackbar.current.showSnackbar(true, result.message);
       setLogin(true);
       navigate("/");
@@ -45,29 +47,6 @@ const loginCognito = (formData, navigate, setLogin) => {
     },
   });
 };
-
-// const saveUserToDb = async (token) => {
-//   try {
-//     const response = await axios.post(
-//       serverInfo.baseUrl + serverInfo.stagingUrl + serverInfo.createUser,
-//       {
-//         userId: "test",
-//         email: "testEmail",
-//         firstName: "Tasnim",
-//         lastName: "Khan",
-//       },
-//       {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//       }
-//     );
-
-//     console.log(response);
-//   } catch (error) {
-//     console.log(`Error: ${error.message}`);
-//   }
-// };
 
 const Login = () => {
   const { isLogin, setLogin } = useContext(AuthContext);

@@ -1,9 +1,11 @@
 export const serverInfo = {
   baseUrl:
-    "https://n20q8gasae.execute-api.us-east-1.amazonaws.com",
-  stagingUrl: "/staging",
-  createUser: "/user/create",
-  createBook: "/book/create"
+    "https://033nm4ea2c.execute-api.us-east-1.amazonaws.com/api",
+  stagingUrl: "",
+  createUser: "/users",
+  users: "/users",
+  books: "/books",
+  getAllBooks: "/book/all"
 };
 
 export const regEx = {

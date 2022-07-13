@@ -20,6 +20,7 @@ import useInput from "../hooks/use-input";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { snackbar } from "../components";
+import { v4 } from "uuid";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -103,7 +104,7 @@ const AddBook = () => {
 
   const uploadImage = (file) => {
     // Make the path unique by adding UUID before filename maybe.
-    const filePath = "/bookImgs/" + uuidv4() + file.name;
+    const filePath = "/bookImgs/" + v4() + file.name;
     const storageRef = ref(storage, filePath);
 
     uploadBytes(storageRef, file)
@@ -131,10 +132,13 @@ const AddBook = () => {
     const jwtToken = localStorage.getItem("AWS_JWT_TOKEN");
     const userId = localStorage.getItem("USER_ID");
 
+    console.log(jwtToken);
+
     try {
       const response = await axios.post(
-        serverInfo.baseUrl + serverInfo.stagingUrl + serverInfo.createBook,
+        serverInfo.baseUrl + serverInfo.books,
         {
+          bookId: v4(),
           title: title,
           description: description,
           author: author,
@@ -149,7 +153,7 @@ const AddBook = () => {
           },
         }
       );
-      snackbar.current.showSnackbar(true, response.message);
+      snackbar.current.showSnackbar(true, response.data.message);
       navigate("/home");
     } catch (error) {
       console.log(`Error: ${error}`);
