@@ -1,7 +1,15 @@
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "../context";
 import { Navbar } from "../components";
-import { Home, Login, Signup, ForgotPassword, AddBook, Review } from "../pages";
+import {
+  Home,
+  Login,
+  Signup,
+  ForgotPassword,
+  AddBook,
+  Review,
+  Verification,
+} from "../pages";
 
 const AppRoutes = () => {
   const { isLogin } = useAuth();
@@ -12,6 +20,7 @@ const AppRoutes = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verification" element={<Verification />}></Route>
       </Route>
       <Route
         path="*"

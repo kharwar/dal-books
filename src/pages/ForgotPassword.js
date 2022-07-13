@@ -12,16 +12,10 @@ import useInput from "../hooks/use-input";
 import { AuthenticationDetails, CognitoUser } from "amazon-cognito-identity-js";
 import { useNavigate } from "react-router-dom";
 import { regEx, simpleChangeHandler } from "../utils";
+import { snackbar } from "../components";
 import UserPool from "../UserPool";
 
-const loginCognito = (formData) => {
-  const authenticationData = {
-    Username: formData.email,
-    Password: formData.password,
-  };
-
-  const authenticationDetails = new AuthenticationDetails(authenticationData);
-
+const forgotPasswordCognito = (formData) => {
   const userData = {
     Username: formData.email,
     Pool: UserPool,
@@ -29,17 +23,9 @@ const loginCognito = (formData) => {
 
   const cognitoUser = new CognitoUser(userData);
 
-  cognitoUser.authenticateUser(authenticationDetails, {
-    onSuccess: (result) => {
-      var accessToken = result.getAccessToken().getJwtToken();
-      var idToken = result.idToken.jwtToken;
-      console.log("LoginSuccess", result);
-      console.log("LoginSuccess", accessToken);
-      console.log("LoginSuccess", idToken);
-    },
-    onFailure: (error) => {
-      console.log("LoginError", error);
-    },
+  cognitoUser.forgotPassword({
+    onSuccess: (res) => console.log(JSON.stringify(res)),
+    onFailure: (err) => console.log(err),
   });
 };
 
@@ -63,9 +49,11 @@ const ForgotPassword = () => {
   const formSubmissionHandler = (event) => {
     event.preventDefault();
 
-    loginCognito({
-      email: email,
+    forgotPasswordCognito({
+      email,
     });
+    snackbar.current.showSnackbar(true, "Verification Email Sent");
+    navigate("/verification", { state: { email } });
   };
 
   return (
@@ -79,7 +67,7 @@ const ForgotPassword = () => {
           alignItems="center"
           justifyContent="center"
         >
-          {"Sign In"}
+          {"Send Verification Code"}
         </Typography>
 
         <form onSubmit={formSubmissionHandler}>
@@ -115,6 +103,15 @@ const ForgotPassword = () => {
           </Box>
         </form>
         <Grid container justifyContent="flex-end">
+          <Grid item xs>
+            <Link
+              variant="body2"
+              onClick={() => navigate("/verification")}
+              sx={{ cursor: "pointer" }}
+            >
+              {"Already have a code?"}
+            </Link>
+          </Grid>
           <Grid item>
             <Link
               variant="body2"
