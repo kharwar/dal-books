@@ -62,6 +62,7 @@ const saveUserToDb = async (data, userId, navigate) => {
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
+        points: 10
       }
     );
     snackbar.current.showSnackbar(

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Paper, Grid, Container } from "@mui/material";
-import BookTile from "../components/book-tile";
+import { BookTile } from "../components";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { snackbar } from "../components";
@@ -16,7 +16,6 @@ const getAllBooksFromDb = async (setPostedBooks) => {
         "content-type": "application/json",
       },
     });
-    console.log(response.data);
     setPostedBooks(response.data.response.Items);
   } catch (error) {
     console.log(`Error: ${error}`);

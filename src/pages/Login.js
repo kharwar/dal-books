@@ -14,12 +14,12 @@ import { AuthenticationDetails, CognitoUser } from "amazon-cognito-identity-js";
 import { useNavigate } from "react-router-dom";
 import { regEx, simpleChangeHandler } from "../utils";
 import UserPool from "../UserPool";
-import { AuthContext } from "../context";
+import { AuthContext, PointsContext } from "../context";
 import { snackbar } from "../components";
 import axios from "axios";
 import { serverInfo } from "../utils";
 
-const loginCognito = (formData, navigate, setLogin) => {
+const loginCognito = (formData, navigate, setLogin, setUserPoints) => {
   const authenticationData = {
     Username: formData.email,
     Password: formData.password,
@@ -39,10 +39,8 @@ const loginCognito = (formData, navigate, setLogin) => {
       localStorage.setItem("AWS_JWT_TOKEN", result.idToken.jwtToken);
       localStorage.setItem("USER_ID", result.idToken.payload.sub);
 
-      console.log(result.idToken.jwtToken);
-
-      snackbar.current.showSnackbar(true, result.message);
-      getLoggedInUserDetails(navigate, setLogin);
+      snackbar.current.showSnackbar(true, "Login Successful!");
+      getLoggedInUserDetails(navigate, setLogin, setUserPoints);
     },
     onFailure: (error) => {
       snackbar.current.showSnackbar(true, error.message);
@@ -50,7 +48,7 @@ const loginCognito = (formData, navigate, setLogin) => {
   });
 };
 
-const getLoggedInUserDetails = async (navigate, setLogin) => {
+const getLoggedInUserDetails = async (navigate, setLogin, setUserPoints) => {
   const jwtToken = localStorage.getItem("AWS_JWT_TOKEN");
   const userId = localStorage.getItem("USER_ID");
 
@@ -70,9 +68,8 @@ const getLoggedInUserDetails = async (navigate, setLogin) => {
     localStorage.setItem("USER_EMAIL", response.data.data.Item.email);
     localStorage.setItem("USER_POINTS", response.data.data.Item.points);
 
-    console.log(response.data);
-
     setLogin(true);
+    setUserPoints(response.data.data.Item.points);
     navigate("/");
   } catch (error) {
     console.log(`Error: ${error}`);
@@ -82,6 +79,7 @@ const getLoggedInUserDetails = async (navigate, setLogin) => {
 
 const Login = () => {
   const { isLogin, setLogin } = useContext(AuthContext);
+  const { userPoints, setUserPoints } = useContext(PointsContext);
   const navigate = useNavigate();
 
   // Email
@@ -123,7 +121,8 @@ const Login = () => {
         password: password,
       },
       navigate,
-      setLogin
+      setLogin,
+      setUserPoints
     );
   };
 

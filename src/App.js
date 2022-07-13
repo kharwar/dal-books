@@ -7,21 +7,30 @@ import AppRoutes from "./routes";
 import { BrowserRouter } from "react-router-dom";
 import AlertDialog, { AlertProvider } from "./components/alert-dialog";
 import { snackbarRef } from "./components/material-snackbar";
-import { AuthContext } from "./context";
+import { AuthContext, PointsContext } from "./context";
 
 function App() {
-  const [isLogin, setLogin] = useState(localStorage.getItem("USER_ID") ? true : false);
+  const [isLogin, setLogin] = useState(
+    localStorage.getItem("USER_ID") ? true : false
+  );
+  const [userPoints, setUserPoints] = useState(
+    localStorage.getItem("USER_POINTS")
+      ? +localStorage.getItem("USER_POINTS")
+      : 0
+  );
   return (
     <ThemeProvider theme={theme}>
       <AuthContext.Provider value={{ isLogin, setLogin }}>
-        <BrowserRouter>
-          <AlertProvider>
-            <CssBaseline />
-            <AppRoutes />
-            <AlertDialog />
-            <MaterialSnackbar ref={snackbarRef} />
-          </AlertProvider>
-        </BrowserRouter>
+        <PointsContext.Provider value={{ userPoints, setUserPoints }}>
+          <BrowserRouter>
+            <AlertProvider>
+              <CssBaseline />
+              <AppRoutes />
+              <AlertDialog />
+              <MaterialSnackbar ref={snackbarRef} />
+            </AlertProvider>
+          </BrowserRouter>
+        </PointsContext.Provider>
       </AuthContext.Provider>
     </ThemeProvider>
   );

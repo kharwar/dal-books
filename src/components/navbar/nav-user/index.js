@@ -9,17 +9,21 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../../context";
+import { AuthContext, PointsContext } from "../../../context";
+import { snackbar } from "../../";
 
 const settings = ["Profile", "Logout"];
 
 const NavUser = () => {
   const navigate = useNavigate();
   const { isLogin, setLogin } = useContext(AuthContext);
+  const { userPoints, setUserPoints } = useContext(PointsContext);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
-  const name = localStorage.getItem("USER_FIRST_NAME") + " " + localStorage.getItem("USER_LAST_NAME");
-  const availablePoints = localStorage.getItem("USER_POINTS");
+  const name =
+    localStorage.getItem("USER_FIRST_NAME") +
+    " " +
+    localStorage.getItem("USER_LAST_NAME");
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -29,6 +33,11 @@ const NavUser = () => {
     if (setting === "Logout") {
       localStorage.removeItem("AWS_JWT_TOKEN");
       localStorage.removeItem("USER_ID");
+      localStorage.removeItem("USER_FIRST_NAME");
+      localStorage.removeItem("USER_LAST_NAME");
+      localStorage.removeItem("USER_EMAIL");
+      localStorage.removeItem("USER_POINTS");
+      snackbar.current.showSnackbar(true, "Logout Successful!");
       setLogin(false);
       navigate("/login");
     }
@@ -39,7 +48,12 @@ const NavUser = () => {
     <Box sx={{ flexGrow: 0 }}>
       <Tooltip title="Settings">
         <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-          <Avatar alt={name} src={"https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRsbRYnwHo7eSy-5Uc29L1UgYk2kgVhH9qO1A&usqp=CAU"} />
+          <Avatar
+            alt={name}
+            src={
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRsbRYnwHo7eSy-5Uc29L1UgYk2kgVhH9qO1A&usqp=CAU"
+            }
+          />
           <Typography
             textAlign="center"
             sx={{
@@ -48,7 +62,7 @@ const NavUser = () => {
               ...styling.title,
             }}
           >
-            {` ${name} (Available Points: ${availablePoints})`} 
+            {` ${name} (Available Points: ${userPoints})`}
           </Typography>
         </IconButton>
       </Tooltip>
