@@ -1,5 +1,5 @@
 import AppBar from "@mui/material/AppBar";
-import { Box, Toolbar, Container, Button } from "@mui/material/";
+import { Box, Toolbar, Container, Button, Avatar } from "@mui/material/";
 import NavTitle from "./nav-title";
 import NavMenuPages from "./nav-menu-pages";
 import NavCreateButton from "./nav-create-button";
@@ -24,6 +24,12 @@ const Navbar = () => {
     <AppBar position="sticky">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
+          <Avatar
+            src={
+              "https://icon-library.com/images/icon-for-books/icon-for-books-29.jpg"
+            }
+            sx={{ marginRight: "4px" }}
+          />
           <NavTitle
             title="DalBooks"
             sx={{

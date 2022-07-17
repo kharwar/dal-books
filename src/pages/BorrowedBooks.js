@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Paper, Grid, Container } from "@mui/material";
+import { Paper, Grid, Container, Typography } from "@mui/material";
 import { BookTile } from "../components";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -38,6 +38,9 @@ const BorrowedBooks = () => {
   return (
     <Container maxWidth="lg">
       <Paper sx={{ m: "50px", p: "30px" }}>
+        {postedBooks.length < 1 && (
+          <Typography variant="h6">No Books Borrowed</Typography>
+        )}
         <Grid container spacing={3} rowGap={2}>
           {postedBooks.map((book) => (
             <Grid key={book.bookId} item xs={4}>

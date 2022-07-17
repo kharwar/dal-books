@@ -52,6 +52,10 @@ const BookReviews = () => {
           {"Book Reviews"}
         </Typography>
 
+        {reviews.length < 1 && (
+          <Typography variant="h6">No Reviews Found!</Typography>
+        )}
+
         <Grid container spacing={3}>
           {reviews.map((review) => (
             <Grid key={review.reviewId} item xs={12}>
