@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext, PointsContext } from "../../../context";
 import { snackbar } from "../../";
 
-const settings = ["Profile", "Logout"];
+const settings = ["Logout"];
 
 const NavUser = () => {
   const navigate = useNavigate();
